@@ -35,39 +35,64 @@ export default function MessagesPage() {
   }, [router]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-lg px-4 pt-4 pb-nav">
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-stone-900">{t("messages")}</h1>
+    <main className="mx-auto min-h-dvh max-w-lg px-4 pt-safe pb-nav">
+      <header className="mb-5 flex items-center justify-between animate-fade-up">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-turquoise">
+            {t("city")}
+          </p>
+          <h1 className="text-xl font-bold text-indigo-deep">{t("messages")}</h1>
+        </div>
         <LanguageToggle />
       </header>
 
       {loading ? (
-        <p className="text-center text-sm text-stone-400">加载中…</p>
+        <div className="overflow-hidden rounded-3xl border border-cream-300/80 bg-white shadow-soft">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center gap-3 border-b border-cream-200 px-4 py-3.5 last:border-0">
+              <div className="skeleton h-12 w-12 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <div className="skeleton h-4 w-24 rounded" />
+                <div className="skeleton h-3 w-40 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : threads.length === 0 ? (
-        <div className="mt-16 rounded-3xl border border-dashed border-amber-200 bg-white/70 px-6 py-12 text-center">
-          <p className="text-lg font-semibold text-stone-700">{t("emptyMessages")}</p>
-          <p className="mt-2 text-sm text-stone-500">{t("emptyMatchesHint")}</p>
+        <div className="mt-10 flex flex-col items-center rounded-4xl border border-dashed border-turquoise/30 bg-white/80 px-6 py-14 text-center shadow-soft animate-fade-up">
+          <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-mist text-2xl text-indigo-soft">
+            ✉
+          </div>
+          <p className="text-lg font-bold text-indigo-deep">{t("emptyMessages")}</p>
+          <p className="mt-2 max-w-xs text-sm text-indigo-soft">{t("emptyMatchesHint")}</p>
+          <Link
+            href="/discover"
+            className="pressable mt-5 inline-block rounded-full bg-turquoise px-5 py-2.5 text-sm font-semibold text-white shadow-soft"
+          >
+            {t("goDiscover")}
+          </Link>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-100 overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
+        <ul className="overflow-hidden rounded-3xl border border-cream-300/80 bg-white shadow-soft animate-fade-up">
           {threads.map((th) => (
-            <li key={th.threadId}>
+            <li key={th.threadId} className="border-b border-cream-200 last:border-0">
               <Link
                 href={`/chat/${th.threadId}`}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-amber-50/50"
+                className="pressable flex items-center gap-3 px-4 py-3.5 transition hover:bg-cream-100/80"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={th.other.avatarUrl}
                   alt={th.other.name}
-                  className="h-12 w-12 rounded-full object-cover"
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-cream-200"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-stone-800">{th.other.name}</p>
-                  <p className="truncate text-xs text-stone-500">
+                  <p className="font-semibold text-indigo-deep">{th.other.name}</p>
+                  <p className="truncate text-xs text-indigo-soft/80">
                     {th.lastMessage?.body || t("wechatHint")}
                   </p>
                 </div>
+                <span className="text-indigo-mist">›</span>
               </Link>
             </li>
           ))}

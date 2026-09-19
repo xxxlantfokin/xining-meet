@@ -14,23 +14,32 @@ export async function GET() {
       match: { include: { userA: true, userB: true } },
       messages: { orderBy: { createdAt: "desc" }, take: 1 },
     },
-    orderBy: { createdAt: "desc" },
   });
 
-  const items = threads.map((th) => {
-    const other =
-      th.match.userAId === me.id ? th.match.userB : th.match.userA;
-    const last = th.messages[0] ?? null;
-    return {
-      threadId: th.id,
-      matchId: th.matchId,
-      other: publicUser(other),
-      wechatId: other.wechatId,
-      lastMessage: last
-        ? { body: last.body, createdAt: last.createdAt, senderId: last.senderId }
-        : null,
-    };
-  });
+  const items = threads
+    .map((th) => {
+      const other =
+        th.match.userAId === me.id ? th.match.userB : th.match.userA;
+      const last = th.messages[0] ?? null;
+      return {
+        threadId: th.id,
+        matchId: th.matchId,
+        other: publicUser(other),
+        wechatId: other.wechatId,
+        lastMessage: last
+          ? { body: last.body, createdAt: last.createdAt, senderId: last.senderId }
+          : null,
+        sortAt: last?.createdAt?.getTime() ?? th.createdAt.getTime(),
+      };
+    })
+    .sort((a, b) => b.sortAt - a.sortAt)
+    .map((item) => ({
+      threadId: item.threadId,
+      matchId: item.matchId,
+      other: item.other,
+      wechatId: item.wechatId,
+      lastMessage: item.lastMessage,
+    }));
 
   return NextResponse.json({ threads: items });
 }

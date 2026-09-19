@@ -4,19 +4,116 @@
 
 :root {
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --ink: #1a1744;
+  --cream: #f8f4ee;
+  --turquoise: #0d9488;
+  --gold: #c9a24a;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  color: var(--ink);
   background:
-    radial-gradient(ellipse at top, #fef3c7 0%, transparent 55%),
-    radial-gradient(ellipse at bottom right, #ffe4e6 0%, transparent 40%),
-    #fafaf9;
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(13, 148, 136, 0.12), transparent 50%),
+    radial-gradient(ellipse 70% 40% at 100% 0%, rgba(201, 162, 74, 0.14), transparent 45%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(45, 42, 107, 0.06), transparent 50%),
+    #f8f4ee;
+  min-height: 100dvh;
 }
 
-.safe-pb {
-  padding-bottom: calc(0.25rem + var(--safe-bottom));
+::selection {
+  background: rgba(13, 148, 136, 0.2);
+  color: var(--ink);
 }
 
-.pb-nav {
-  padding-bottom: calc(5rem + var(--safe-bottom));
+@layer utilities {
+  .pressable {
+    @apply transition-all duration-150 ease-out;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pressable:active {
+    transform: scale(0.92);
+    filter: brightness(0.95);
+  }
+  .pressable-sm {
+    @apply transition-all duration-100 ease-out;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pressable-sm:active {
+    transform: scale(0.88);
+  }
+  .safe-pb {
+    padding-bottom: calc(0.25rem + var(--safe-bottom));
+  }
+  .pb-nav {
+    padding-bottom: calc(5.5rem + var(--safe-bottom));
+  }
+  .pt-safe {
+    padding-top: calc(0.75rem + var(--safe-top));
+  }
+}
+
+.card-stack-behind {
+  transform: scale(0.96) translateY(10px);
+  opacity: 0.55;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(45, 42, 107, 0.15);
+  border-radius: 4px;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #ebe4d8 0%, #f5efe6 40%, #ebe4d8 80%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.match-sparkle::before,
+.match-sparkle::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: sparkle-float 1.2s ease-out infinite;
+}
+.match-sparkle::before {
+  top: 12%;
+  left: 18%;
+  animation-delay: 0.1s;
+}
+.match-sparkle::after {
+  top: 20%;
+  right: 16%;
+  background: var(--turquoise);
+  animation-delay: 0.35s;
+}
+
+@keyframes sparkle-float {
+  0% { opacity: 0; transform: translateY(8px) scale(0.5); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-20px) scale(1); }
+}
+
+@keyframes action-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.86); }
+  100% { transform: scale(1); }
+}
+.action-pop {
+  animation: action-pop 0.28s ease-out;
 }

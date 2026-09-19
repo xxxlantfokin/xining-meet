@@ -5,12 +5,18 @@ import { useLang } from "./LangProvider";
 export default function LanguageToggle() {
   const { lang, setLang } = useLang();
   return (
-    <div className="inline-flex rounded-full border border-amber-200/60 bg-white/80 p-0.5 text-xs shadow-sm">
+    <div
+      className="inline-flex rounded-full border border-indigo-mist/80 bg-white/90 p-0.5 text-xs shadow-soft backdrop-blur"
+      role="group"
+      aria-label="Language"
+    >
       <button
         type="button"
         onClick={() => setLang("zh")}
-        className={`rounded-full px-2.5 py-1 font-medium transition ${
-          lang === "zh" ? "bg-amber-600 text-white" : "text-stone-600"
+        className={`pressable-sm rounded-full px-3 py-1.5 font-semibold tracking-wide transition-all duration-200 ${
+          lang === "zh"
+            ? "bg-indigo-deep text-cream-50 shadow-sm"
+            : "text-indigo-soft hover:text-indigo-deep"
         }`}
       >
         中文
@@ -18,8 +24,10 @@ export default function LanguageToggle() {
       <button
         type="button"
         onClick={() => setLang("bo")}
-        className={`rounded-full px-2.5 py-1 font-medium transition ${
-          lang === "bo" ? "bg-amber-600 text-white" : "text-stone-600"
+        className={`pressable-sm rounded-full px-3 py-1.5 font-semibold tracking-wide transition-all duration-200 ${
+          lang === "bo"
+            ? "bg-turquoise text-white shadow-sm"
+            : "text-indigo-soft hover:text-indigo-deep"
         }`}
       >
         བོད་ཡིག

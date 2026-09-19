@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import LanguageToggle from "@/components/LanguageToggle";
+import Toast from "@/components/Toast";
 import { useLang } from "@/components/LangProvider";
 
 type MatchItem = {
@@ -26,7 +27,7 @@ export default function MatchesPage() {
   const router = useRouter();
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState<string | null>(null);
+  const [toast, setToast] = useState("");
 
   useEffect(() => {
     fetch("/api/matches")
@@ -43,76 +44,88 @@ export default function MatchesPage() {
       .finally(() => setLoading(false));
   }, [router]);
 
-  async function copyWechat(id: string, wechatId: string) {
+  async function copyWechat(wechatId: string) {
     try {
       await navigator.clipboard.writeText(wechatId);
-      setCopied(id);
-      setTimeout(() => setCopied(null), 1500);
+      setToast(`${t("copied")}: ${wechatId}`);
+      setTimeout(() => setToast(""), 1800);
     } catch {
-      prompt("微信号", wechatId);
+      prompt(t("wechat"), wechatId);
     }
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-lg px-4 pt-4 pb-nav">
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-stone-900">{t("matches")}</h1>
+    <main className="mx-auto min-h-dvh max-w-lg px-4 pt-safe pb-nav">
+      <header className="mb-5 flex items-center justify-between animate-fade-up">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-turquoise">
+            {t("city")}
+          </p>
+          <h1 className="text-xl font-bold text-indigo-deep">{t("matches")}</h1>
+        </div>
         <LanguageToggle />
       </header>
 
       {loading ? (
-        <p className="text-center text-sm text-stone-400">加载中…</p>
+        <div className="space-y-3">
+          {[1, 2].map((i) => (
+            <div key={i} className="skeleton h-28 rounded-3xl" />
+          ))}
+        </div>
       ) : matches.length === 0 ? (
-        <div className="mt-16 rounded-3xl border border-dashed border-amber-200 bg-white/70 px-6 py-12 text-center">
-          <p className="text-lg font-semibold text-stone-700">{t("emptyMatches")}</p>
-          <p className="mt-2 text-sm text-stone-500">{t("emptyMatchesHint")}</p>
+        <div className="mt-10 flex flex-col items-center rounded-4xl border border-dashed border-turquoise/30 bg-white/80 px-6 py-14 text-center shadow-soft animate-fade-up">
+          <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gold-mist text-2xl text-gold-deep">
+            ♥
+          </div>
+          <p className="text-lg font-bold text-indigo-deep">{t("emptyMatches")}</p>
+          <p className="mt-2 max-w-xs text-sm text-indigo-soft">{t("emptyMatchesHint")}</p>
           <Link
             href="/discover"
-            className="mt-4 inline-block rounded-full bg-amber-600 px-4 py-2 text-sm font-medium text-white"
+            className="pressable mt-5 inline-block rounded-full bg-turquoise px-5 py-2.5 text-sm font-semibold text-white shadow-soft"
           >
-            {t("discover")}
+            {t("goDiscover")}
           </Link>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3 animate-fade-up">
           {matches.map((m) => (
             <li
               key={m.matchId}
-              className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm"
+              className="rounded-3xl border border-cream-300/80 bg-white p-4 shadow-soft transition hover:shadow-card"
             >
               <div className="flex items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={m.other.avatarUrl}
                   alt={m.other.name}
-                  className="h-14 w-14 rounded-full object-cover"
+                  className="h-14 w-14 rounded-2xl object-cover ring-2 ring-cream-200"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold">
+                  <p className="font-semibold text-indigo-deep">
                     {m.other.name}
-                    <span className="ml-1 text-sm font-normal text-stone-500">
+                    <span className="ml-1.5 text-sm font-normal text-indigo-soft">
                       {m.other.age}
                       {t("age")}
                     </span>
                   </p>
-                  <p className="truncate text-xs text-stone-500">{m.other.bio}</p>
+                  <p className="mt-0.5 truncate text-xs text-indigo-soft/80">{m.other.bio}</p>
                 </div>
               </div>
-              <div className="mt-3 flex gap-2">
+              <div className="mt-3.5 flex gap-2">
                 {m.threadId && (
                   <Link
                     href={`/chat/${m.threadId}`}
-                    className="flex-1 rounded-full bg-amber-600 py-2 text-center text-sm font-medium text-white"
+                    className="pressable flex-1 rounded-full bg-indigo-deep py-2.5 text-center text-sm font-semibold text-cream-50"
                   >
                     {t("chat")}
                   </Link>
                 )}
                 <button
                   type="button"
-                  onClick={() => copyWechat(m.matchId, m.wechatId)}
-                  className="flex-1 rounded-full border border-emerald-200 bg-emerald-50 py-2 text-sm font-medium text-emerald-800"
+                  onClick={() => copyWechat(m.wechatId)}
+                  className="pressable flex-1 rounded-full border border-turquoise/25 bg-turquoise-mist py-2.5 text-sm font-semibold text-turquoise-deep"
                 >
-                  {copied === m.matchId ? t("copied") : t("copyWechat")}
+                  {t("copyWechat")}
                 </button>
               </div>
             </li>
@@ -120,6 +133,7 @@ export default function MatchesPage() {
         </ul>
       )}
 
+      <Toast message={toast} visible={!!toast} />
       <BottomNav />
     </main>
   );
