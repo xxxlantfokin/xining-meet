@@ -94,7 +94,7 @@ export default function DiscoverPage() {
         .catch(() => ({ ok: false, data: {} as Record<string, unknown> }));
 
       // Let fly-off animation play, then advance card (optimistic)
-      await new Promise((r) => setTimeout(r, 320));
+      await new Promise((r) => setTimeout(r, 420));
 
       const { ok, data } = await apiPromise;
 
