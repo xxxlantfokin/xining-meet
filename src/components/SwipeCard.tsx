@@ -10,6 +10,8 @@ type UserCard = {
   city: string;
   bio: string;
   avatarUrl: string;
+  hometown?: string;
+  dialect?: string;
 };
 
 type Dir = "like" | "pass";
@@ -119,8 +121,9 @@ export default function SwipeCard({
       const abs = Math.abs(rawX);
       const rubber = abs <= THRESHOLD ? rawX : Math.sign(rawX) * (THRESHOLD + (abs - THRESHOLD) * 0.35);
       const y = rawY * 0.22;
+      const now = performance.now();
       posRef.current = { x: rubber, y };
-      lastMoveRef.current = { x: e.clientX, t: performance.now() };
+      lastMoveRef.current = { x: e.clientX, t: now };
       cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => paint(rubber, y, true, false));
     },
@@ -138,18 +141,21 @@ export default function SwipeCard({
       draggingRef.current = false;
       const { x, y } = posRef.current;
       const last = lastMoveRef.current;
-      const dt = last ? Math.max(1, performance.now() - last.t) : 16;
-      // approximate velocity from last segment vs start
-      const vx =
-        last && startRef.current
-          ? (last.x - startRef.current.x) / Math.max(1, last.t - startRef.current.t)
-          : 0;
+      const now = performance.now();
+      // Prefer recent motion; fall back to whole gesture if sample is stale
+      let vx = 0;
+      if (last && startRef.current) {
+        const sampleAge = now - last.t;
+        if (sampleAge < 80) {
+          vx = (last.x - startRef.current.x) / Math.max(16, last.t - startRef.current.t);
+        }
+      }
       startRef.current = null;
 
       const fast = Math.abs(vx) >= VELOCITY;
       const far = Math.abs(x) >= THRESHOLD;
-      if ((far || fast) && (Math.abs(x) > 24 || fast)) {
-        const dir: Dir = fast ? (vx > 0 ? "like" : "pass") : (x > 0 ? "like" : "pass");
+      if ((far || fast) && (Math.abs(x) > 24 || Math.abs(vx) >= VELOCITY * 0.85)) {
+        const dir: Dir = fast ? (vx > 0 ? "like" : "pass") : x > 0 ? "like" : "pass";
         commit(dir, x, y);
         return;
       }
@@ -188,7 +194,11 @@ export default function SwipeCard({
           </h2>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-cream-200/90">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-turquoise-soft" />
-            {user.city} · {genderLabel}
+            {user.city}
+            {user.hometown ? ` · ${user.hometown}` : ""}
+            {user.dialect ? ` · ${user.dialect}` : ""}
+            {" · "}
+            {genderLabel}
           </p>
           <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-cream-100/95">{user.bio}</p>
         </div>

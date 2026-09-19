@@ -2,7 +2,44 @@
 
 import Link from "next/link";
 
+function AvatarBlock({
+  name,
+  avatarUrl,
+  side,
+}: {
+  name: string;
+  avatarUrl?: string;
+  side: "left" | "right";
+}) {
+  const initial = (name || "?").trim().charAt(0) || "?";
+  const colors =
+    side === "left"
+      ? "from-turquoise to-turquoise-deep"
+      : "from-indigo-soft to-indigo-deep";
+
+  return (
+    <div
+      className={`relative h-20 w-20 overflow-hidden rounded-full ring-4 ring-white shadow-card ${
+        side === "left" ? "z-10" : "z-20 -ml-5"
+      }`}
+    >
+      {avatarUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />
+      ) : (
+        <div
+          className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${colors} text-2xl font-bold text-white`}
+        >
+          {initial}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function MatchModal({
+  myName,
+  myAvatarUrl,
   name,
   avatarUrl,
   threadId,
@@ -11,8 +48,10 @@ export default function MatchModal({
   keepLabel,
   onClose,
 }: {
+  myName: string;
+  myAvatarUrl?: string;
   name: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   threadId: string;
   matchedLabel: string;
   openChatLabel: string;
@@ -29,16 +68,16 @@ export default function MatchModal({
           ✦ Match ✦
         </p>
 
-        <div className="relative mx-auto mt-4 flex h-24 w-24 items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-turquoise/30 to-gold/40 animate-pulse-soft" />
-          <div className="relative h-20 w-20 overflow-hidden rounded-full ring-4 ring-white shadow-card">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />
-          </div>
+        <div className="relative mx-auto mt-5 flex items-center justify-center">
+          <div className="absolute inset-0 m-auto h-24 w-40 rounded-full bg-gradient-to-br from-turquoise/20 to-gold/30 animate-pulse-soft" />
+          <AvatarBlock name={myName} avatarUrl={myAvatarUrl} side="left" />
+          <AvatarBlock name={name} avatarUrl={avatarUrl} side="right" />
         </div>
 
-        <p className="relative mt-5 text-lg font-bold text-indigo-deep">{matchedLabel}</p>
-        <p className="relative mt-1 text-sm text-indigo-soft">{name}</p>
+        <p className="relative mt-6 text-lg font-bold text-indigo-deep">{matchedLabel}</p>
+        <p className="relative mt-1 text-sm text-indigo-soft">
+          {myName} · {name}
+        </p>
 
         <div className="relative mt-7 flex flex-col gap-2.5">
           <Link

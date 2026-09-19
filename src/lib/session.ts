@@ -24,6 +24,8 @@ export function publicUser(u: {
   city: string;
   bio: string;
   avatarUrl: string;
+  hometown?: string;
+  dialect?: string;
 }) {
   return {
     id: u.id,
@@ -33,5 +35,28 @@ export function publicUser(u: {
     city: u.city,
     bio: u.bio,
     avatarUrl: u.avatarUrl,
+    hometown: u.hometown ?? "",
+    dialect: u.dialect ?? "",
+  };
+}
+
+/** Full profile for the logged-in user. */
+export function selfUser(u: {
+  id: string;
+  name: string;
+  gender: string;
+  age: number;
+  city: string;
+  bio: string;
+  avatarUrl: string;
+  wechatId: string;
+  hometown?: string;
+  dialect?: string;
+  languagePref?: string;
+}) {
+  return {
+    ...publicUser(u),
+    wechatId: u.wechatId,
+    languagePref: (u.languagePref === "bo" ? "bo" : "zh") as "zh" | "bo",
   };
 }

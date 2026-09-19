@@ -21,6 +21,12 @@ const icons = {
       <path d="M4 6.5A2.5 2.5 0 016.5 4h11A2.5 2.5 0 0120 6.5v8a2.5 2.5 0 01-2.5 2.5H9l-4 3v-3.5A2.5 2.5 0 014 14.5v-8z" strokeLinejoin="round" />
     </svg>
   ),
+  me: (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 19c0-3.5 3-6 7-6s7 2.5 7 6" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 export default function BottomNav() {
@@ -30,18 +36,19 @@ export default function BottomNav() {
     { href: "/discover", label: t("discover"), icon: icons.discover },
     { href: "/matches", label: t("matches"), icon: icons.matches },
     { href: "/messages", label: t("messages"), icon: icons.messages },
+    { href: "/me", label: t("me"), icon: icons.me },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-cream-300/80 bg-cream-50/95 backdrop-blur-md safe-pb">
-      <div className="mx-auto flex max-w-lg justify-around px-3 py-2">
+      <div className="mx-auto flex max-w-lg justify-around px-2 py-2">
         {items.map((item) => {
           const active = pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`pressable-sm flex min-w-[4.75rem] flex-col items-center gap-1 rounded-2xl px-3 py-2 text-[11px] font-medium transition-all duration-200 ${
+              className={`pressable-sm flex min-w-[4.25rem] flex-col items-center gap-1 rounded-2xl px-2.5 py-2 text-[11px] font-medium transition-all duration-200 ${
                 active
                   ? "bg-indigo-deep text-cream-50 shadow-soft"
                   : "text-indigo-soft hover:bg-white/70 hover:text-indigo-deep"

@@ -7,6 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import LanguageToggle from "@/components/LanguageToggle";
 import MatchModal from "@/components/MatchModal";
 import SwipeCard from "@/components/SwipeCard";
+import Toast from "@/components/Toast";
 import { useLang } from "@/components/LangProvider";
 
 type UserCard = {
@@ -17,6 +18,8 @@ type UserCard = {
   city: string;
   bio: string;
   avatarUrl: string;
+  hometown?: string;
+  dialect?: string;
 };
 
 type Dir = "like" | "pass";
@@ -35,7 +38,9 @@ export default function DiscoverPage() {
     avatarUrl: string;
     threadId: string;
   } | null>(null);
-  const [meName, setMeName] = useState("");
+  const [me, setMe] = useState<{ name: string; avatarUrl: string } | null>(null);
+  const [toast, setToast] = useState("");
+  const [nearbyHint, setNearbyHint] = useState(false);
   const busyRef = useRef(false);
   const candidatesRef = useRef<UserCard[]>([]);
 
@@ -43,15 +48,21 @@ export default function DiscoverPage() {
     candidatesRef.current = candidates;
   }, [candidates]);
 
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 1400);
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
+    setNearbyHint(false);
     const meRes = await fetch("/api/auth/me");
     const meData = await meRes.json();
     if (!meData.user) {
       router.replace("/login");
       return;
     }
-    setMeName(meData.user.name);
+    setMe({ name: meData.user.name, avatarUrl: meData.user.avatarUrl });
     const res = await fetch("/api/discover");
     if (res.status === 401) {
       router.replace("/login");
@@ -80,8 +91,8 @@ export default function DiscoverPage() {
       setExitDir(direction);
       setPulse(direction);
       setTimeout(() => setPulse(null), 280);
+      showToast(direction === "like" ? t("likedToast") : t("passedToast"));
 
-      // Fire API immediately (don't block animation)
       const apiPromise = fetch("/api/swipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,13 +104,11 @@ export default function DiscoverPage() {
         })
         .catch(() => ({ ok: false, data: {} as Record<string, unknown> }));
 
-      // Let fly-off animation play, then advance card (optimistic)
       await new Promise((r) => setTimeout(r, 420));
 
       const { ok, data } = await apiPromise;
 
       if (!ok) {
-        // Roll back: remount same card
         setExitDir(null);
         setCardKey((k) => k + 1);
         busyRef.current = false;
@@ -113,6 +122,7 @@ export default function DiscoverPage() {
       setBusy(false);
 
       if (data?.matched && data.threadId && data.other) {
+        setToast("");
         setMatchInfo({
           name: data.other.name as string,
           avatarUrl: data.other.avatarUrl as string,
@@ -120,7 +130,7 @@ export default function DiscoverPage() {
         });
       }
     },
-    []
+    [showToast, t]
   );
 
   const current = candidates[0];
@@ -136,9 +146,9 @@ export default function DiscoverPage() {
           <h1 className="mt-0.5 text-xl font-bold tracking-tight text-indigo-deep">
             {t("appName")}
           </h1>
-          {meName && (
+          {me && (
             <p className="mt-0.5 text-xs text-indigo-soft/80">
-              {meName}
+              {me.name}
               <Link
                 href="/login"
                 className="ml-2 text-turquoise underline-offset-2 hover:underline"
@@ -169,20 +179,37 @@ export default function DiscoverPage() {
             <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-turquoise-mist text-2xl text-turquoise">
               ✧
             </div>
-            <p className="text-lg font-bold text-indigo-deep">{t("emptyDiscover")}</p>
-            <p className="mt-2 max-w-xs text-sm text-indigo-soft">
-              {t("emptyDiscoverHint")}
+            <p className="text-lg font-bold text-indigo-deep">
+              {nearbyHint ? t("emptyNearby") : t("emptyDiscover")}
             </p>
-            <div className="mt-5 flex gap-2">
-              <button
-                type="button"
-                onClick={load}
-                className="pressable rounded-full bg-indigo-deep px-5 py-2.5 text-sm font-semibold text-cream-50 shadow-soft"
-              >
-                {t("refresh")}
-              </button>
+            {!nearbyHint && (
+              <p className="mt-2 max-w-xs text-sm text-indigo-soft">
+                {t("emptyDiscoverHint")}
+              </p>
+            )}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              {!nearbyHint ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNearbyHint(true);
+                    load();
+                  }}
+                  className="pressable rounded-full bg-indigo-deep px-5 py-2.5 text-sm font-semibold text-cream-50 shadow-soft"
+                >
+                  {t("refresh")}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={load}
+                  className="pressable rounded-full bg-indigo-deep px-5 py-2.5 text-sm font-semibold text-cream-50 shadow-soft"
+                >
+                  {t("seeNearby")}
+                </button>
+              )}
               <Link
-                href="/login"
+                href="/me"
                 className="pressable rounded-full border border-cream-300 bg-white px-5 py-2.5 text-sm font-medium text-indigo-soft"
               >
                 {t("editProfile")}
@@ -245,8 +272,10 @@ export default function DiscoverPage() {
         </p>
       )}
 
-      {matchInfo && (
+      {matchInfo && me && (
         <MatchModal
+          myName={me.name}
+          myAvatarUrl={me.avatarUrl}
           name={matchInfo.name}
           avatarUrl={matchInfo.avatarUrl}
           threadId={matchInfo.threadId}
@@ -257,6 +286,7 @@ export default function DiscoverPage() {
         />
       )}
 
+      <Toast message={toast} visible={!!toast} />
       <BottomNav />
     </main>
   );

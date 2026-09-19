@@ -117,3 +117,10 @@ body {
 .action-pop {
   animation: action-pop 0.28s ease-out;
 }
+
+/* Subtle haptic-like feedback for primary actions */
+@media (hover: none) {
+  .pressable:active {
+    transform: scale(0.9);
+  }
+}

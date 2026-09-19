@@ -112,7 +112,7 @@ export default function ChatPage() {
             />
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold text-indigo-deep">{other.name}</p>
-              <p className="text-[10px] text-indigo-soft/70">{t("wechatHint")}</p>
+              <p className="text-[10px] text-indigo-soft/70">{t("wechatChatHint")}</p>
             </div>
           </>
         )}

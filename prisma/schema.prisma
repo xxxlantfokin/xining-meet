@@ -8,15 +8,18 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  gender    String
-  age       Int
-  city      String   @default("西宁")
-  bio       String
-  avatarUrl String
-  wechatId  String
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  name         String
+  gender       String
+  age          Int
+  city         String   @default("西宁")
+  bio          String
+  avatarUrl    String
+  wechatId     String
+  hometown     String   @default("")
+  dialect      String   @default("")
+  languagePref String   @default("zh")
+  createdAt    DateTime @default(now())
 
   swipesFrom Swipe[]   @relation("SwipeFrom")
   swipesTo   Swipe[]   @relation("SwipeTo")

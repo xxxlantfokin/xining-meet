@@ -89,7 +89,7 @@ export default function MessagesPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-indigo-deep">{th.other.name}</p>
                   <p className="truncate text-xs text-indigo-soft/80">
-                    {th.lastMessage?.body || t("wechatHint")}
+                    {th.lastMessage?.body || t("wechatChatHint")}
                   </p>
                 </div>
                 <span className="text-indigo-mist">›</span>
