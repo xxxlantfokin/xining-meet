@@ -182,10 +182,10 @@ export default function DiscoverPage() {
                 {t("refresh")}
               </button>
               <Link
-                href="/matches"
+                href="/login"
                 className="pressable rounded-full border border-cream-300 bg-white px-5 py-2.5 text-sm font-medium text-indigo-soft"
               >
-                {t("matches")}
+                {t("editProfile")}
               </Link>
             </div>
           </div>
