@@ -86,6 +86,7 @@ const users = [
 ];
 
 async function main() {
+  await prisma.weChatRequest.deleteMany();
   await prisma.message.deleteMany();
   await prisma.thread.deleteMany();
   await prisma.match.deleteMany();

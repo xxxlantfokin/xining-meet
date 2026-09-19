@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, publicUser } from "@/lib/session";
+import { buildWeChatConsent } from "@/lib/wechatConsent";
 
 async function assertThreadAccess(threadId: string, userId: string) {
   const thread = await prisma.thread.findUnique({
@@ -34,10 +35,19 @@ export async function GET(
     orderBy: { createdAt: "asc" },
   });
 
+  const wechat = await buildWeChatConsent(
+    thread.matchId,
+    me.id,
+    other.id,
+    other.wechatId,
+    me.wechatId
+  );
+
   return NextResponse.json({
     threadId: thread.id,
+    matchId: thread.matchId,
     other: publicUser(other),
-    wechatId: other.wechatId,
+    wechat,
     messages: messages.map((m) => ({
       id: m.id,
       body: m.body,

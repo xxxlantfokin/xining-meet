@@ -14,6 +14,30 @@ type Msg = {
   createdAt: string;
 };
 
+type WeChatConsent = {
+  wechatId: string | null;
+  wechatOwner: "other" | "me" | null;
+  state: "hidden" | "requested" | "approved";
+  myRequestStatus: string;
+  incomingPending: boolean;
+  incomingStatus: string;
+  iSharedMine: boolean;
+  canRevokeOther: boolean;
+  canRevokeMine: boolean;
+};
+
+const emptyConsent: WeChatConsent = {
+  wechatId: null,
+  wechatOwner: null,
+  state: "hidden",
+  myRequestStatus: "none",
+  incomingPending: false,
+  incomingStatus: "none",
+  iSharedMine: false,
+  canRevokeOther: false,
+  canRevokeMine: false,
+};
+
 export default function ChatPage() {
   const { t } = useLang();
   const params = useParams();
@@ -21,14 +45,20 @@ export default function ChatPage() {
   const router = useRouter();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [other, setOther] = useState<{ name: string; avatarUrl: string } | null>(null);
-  const [wechatId, setWechatId] = useState("");
+  const [consent, setConsent] = useState<WeChatConsent>(emptyConsent);
   const [meId, setMeId] = useState("");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [acting, setActing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(""), 1800);
+  }
 
   const load = useCallback(async () => {
     const meRes = await fetch("/api/auth/me");
@@ -51,7 +81,7 @@ export default function ChatPage() {
     const data = await res.json();
     setMessages(data.messages ?? []);
     setOther(data.other);
-    setWechatId(data.wechatId ?? "");
+    setConsent(data.wechat ?? emptyConsent);
     setLoading(false);
   }, [threadId, router]);
 
@@ -81,16 +111,38 @@ export default function ChatPage() {
     setSending(false);
   }
 
-  async function copyWechat() {
-    if (!wechatId) return;
+  async function wechatAction(action: string, target?: string) {
+    if (acting) return;
+    setActing(true);
     try {
-      await navigator.clipboard.writeText(wechatId);
-      setToast(`${t("copied")}: ${wechatId}`);
-      setTimeout(() => setToast(""), 1800);
-    } catch {
-      prompt(t("wechat"), wechatId);
+      const res = await fetch(`/api/threads/${threadId}/wechat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, ...(target ? { target } : {}) }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setConsent(data);
+      if (action === "request") showToast(t("wechatRequestedToast"));
+      if (action === "approve") showToast(t("wechatApprovedToast"));
+      if (action === "deny") showToast(t("wechatDeferredToast"));
+      if (action === "revoke") showToast(t("wechatRevokedToast"));
+    } finally {
+      setActing(false);
     }
   }
+
+  async function copyWechat() {
+    if (!consent.wechatId) return;
+    try {
+      await navigator.clipboard.writeText(consent.wechatId);
+      showToast(`${t("copied")}: ${consent.wechatId}`);
+    } catch {
+      prompt(t("wechat"), consent.wechatId);
+    }
+  }
+
+  const showCopy = consent.state === "approved" && !!consent.wechatId;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col">
@@ -121,21 +173,86 @@ export default function ChatPage() {
         <LanguageToggle />
       </header>
 
-      {wechatId && (
+      {/* Incoming request: 同意 / 先聊聊 */}
+      {consent.incomingPending && (
+        <div className="border-b border-indigo/10 bg-indigo-mist/50 px-4 py-3">
+          <p className="mb-2.5 text-[13px] leading-[1.45] text-ink-soft">{t("wechatIncoming")}</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={acting}
+              onClick={() => wechatAction("approve")}
+              className="pressable flex-1 rounded-full bg-teal py-2.5 text-[14px] font-semibold text-cream-50 shadow-soft disabled:opacity-50"
+            >
+              {t("wechatApprove")}
+            </button>
+            <button
+              type="button"
+              disabled={acting}
+              onClick={() => wechatAction("deny")}
+              className="pressable flex-1 rounded-full bg-cream-50 py-2.5 text-[14px] font-semibold text-ink-soft ring-1 ring-cream-300 disabled:opacity-50"
+            >
+              {t("wechatDefer")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Approved: show ID + copy (only when wechatId present) */}
+      {showCopy && (
         <div className="border-b border-teal/10 bg-teal-mist/40 px-4 py-2.5">
-          <button
-            type="button"
-            onClick={copyWechat}
-            className="pressable flex w-full items-center justify-between gap-2 rounded-2xl bg-cream-50 px-3.5 py-2.5 text-[15px] shadow-soft"
-          >
-            <span className="min-w-0 truncate text-teal-deep">
-              {t("wechat")}:{" "}
-              <span className="font-mono font-semibold">{wechatId}</span>
-            </span>
-            <span className="shrink-0 rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-cream-50">
+          <div className="flex w-full items-center justify-between gap-2 rounded-2xl bg-cream-50 px-3.5 py-2.5 text-[15px] shadow-soft">
+            <button
+              type="button"
+              onClick={copyWechat}
+              className="pressable min-w-0 flex-1 truncate text-left text-teal-deep"
+            >
+              {consent.wechatOwner === "me" ? t("wechatSharedMine") : t("wechat")}:{" "}
+              <span className="font-mono font-semibold">{consent.wechatId}</span>
+            </button>
+            <button
+              type="button"
+              onClick={copyWechat}
+              className="pressable shrink-0 rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-cream-50"
+            >
               {t("copyWechat")}
-            </span>
-          </button>
+            </button>
+          </div>
+          {(consent.canRevokeOther || consent.canRevokeMine) && (
+            <button
+              type="button"
+              disabled={acting}
+              onClick={() =>
+                wechatAction(
+                  "revoke",
+                  consent.canRevokeOther ? "other" : "mine"
+                )
+              }
+              className="mt-2 w-full text-center text-[12px] font-medium text-ink-mute underline-offset-2 hover:text-ink-soft hover:underline disabled:opacity-50"
+            >
+              {t("wechatRevoke")}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Request / waiting for OTHER's WeChat — no copy until approved */}
+      {!consent.canRevokeOther && !consent.incomingPending && (
+        <div className="border-b border-cream-300/50 bg-cream-100/60 px-4 py-2.5">
+          {consent.myRequestStatus === "pending" || consent.state === "requested" ? (
+            <p className="rounded-2xl bg-cream-50 px-3.5 py-2.5 text-center text-[13px] leading-[1.45] text-ink-soft shadow-soft">
+              {t("wechatWaiting")}
+            </p>
+          ) : (
+            <button
+              type="button"
+              disabled={acting}
+              onClick={() => wechatAction("request")}
+              className="pressable w-full rounded-2xl bg-cream-50 px-3.5 py-2.5 text-[14px] font-semibold text-indigo shadow-soft ring-1 ring-indigo/15 disabled:opacity-50"
+            >
+              {t("wechatRequest")}
+            </button>
+          )}
         </div>
       )}
 

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import LanguageToggle from "@/components/LanguageToggle";
-import Toast from "@/components/Toast";
 import { useLang } from "@/components/LangProvider";
 
 type MatchItem = {
@@ -19,7 +18,6 @@ type MatchItem = {
     avatarUrl: string;
     bio: string;
   };
-  wechatId: string;
 };
 
 export default function MatchesPage() {
@@ -27,7 +25,6 @@ export default function MatchesPage() {
   const router = useRouter();
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState("");
 
   useEffect(() => {
     fetch("/api/matches")
@@ -43,16 +40,6 @@ export default function MatchesPage() {
       })
       .finally(() => setLoading(false));
   }, [router]);
-
-  async function copyWechat(wechatId: string) {
-    try {
-      await navigator.clipboard.writeText(wechatId);
-      setToast(`${t("copied")}: ${wechatId}`);
-      setTimeout(() => setToast(""), 1800);
-    } catch {
-      prompt(t("wechat"), wechatId);
-    }
-  }
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-4 pt-safe pb-nav">
@@ -114,28 +101,20 @@ export default function MatchesPage() {
                 </div>
               </div>
               <div className="mt-3.5 flex gap-2">
-                {m.threadId && (
+                {m.threadId ? (
                   <Link
                     href={`/chat/${m.threadId}`}
                     className="pressable flex-1 rounded-full bg-ink py-2.5 text-center text-[15px] font-semibold text-cream-50"
                   >
                     {t("chat")}
                   </Link>
-                )}
-                <button
-                  type="button"
-                  onClick={() => copyWechat(m.wechatId)}
-                  className="pressable flex-1 rounded-full bg-teal-mist py-2.5 text-[15px] font-semibold text-teal-deep"
-                >
-                  {t("copyWechat")}
-                </button>
+                ) : null}
               </div>
             </li>
           ))}
         </ul>
       )}
 
-      <Toast message={toast} visible={!!toast} />
       <BottomNav />
     </main>
   );

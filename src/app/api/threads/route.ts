@@ -25,7 +25,6 @@ export async function GET() {
         threadId: th.id,
         matchId: th.matchId,
         other: publicUser(other),
-        wechatId: other.wechatId,
         lastMessage: last
           ? { body: last.body, createdAt: last.createdAt, senderId: last.senderId }
           : null,
@@ -37,7 +36,6 @@ export async function GET() {
       threadId: item.threadId,
       matchId: item.matchId,
       other: item.other,
-      wechatId: item.wechatId,
       lastMessage: item.lastMessage,
     }));
 

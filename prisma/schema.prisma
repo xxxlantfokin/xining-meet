@@ -21,11 +21,13 @@ model User {
   languagePref String   @default("zh")
   createdAt    DateTime @default(now())
 
-  swipesFrom Swipe[]   @relation("SwipeFrom")
-  swipesTo   Swipe[]   @relation("SwipeTo")
-  matchesA   Match[]   @relation("MatchA")
-  matchesB   Match[]   @relation("MatchB")
-  messages   Message[]
+  swipesFrom     Swipe[]         @relation("SwipeFrom")
+  swipesTo       Swipe[]         @relation("SwipeTo")
+  matchesA       Match[]         @relation("MatchA")
+  matchesB       Match[]         @relation("MatchB")
+  messages       Message[]
+  wechatFrom     WeChatRequest[] @relation("WeChatFrom")
+  wechatTo       WeChatRequest[] @relation("WeChatTo")
 }
 
 model Swipe {
@@ -47,9 +49,10 @@ model Match {
   userBId   String
   createdAt DateTime @default(now())
 
-  userA  User    @relation("MatchA", fields: [userAId], references: [id])
-  userB  User    @relation("MatchB", fields: [userBId], references: [id])
-  thread Thread?
+  userA          User            @relation("MatchA", fields: [userAId], references: [id])
+  userB          User            @relation("MatchB", fields: [userBId], references: [id])
+  thread         Thread?
+  wechatRequests WeChatRequest[]
 
   @@unique([userAId, userBId])
 }
@@ -72,4 +75,24 @@ model Message {
 
   thread Thread @relation(fields: [threadId], references: [id])
   sender User   @relation(fields: [senderId], references: [id])
+}
+
+/// Directional consent: fromUser asks to see toUser's WeChat.
+/// Only after status=approved do both parties see toUser.wechatId in chat.
+model WeChatRequest {
+  id         String   @id @default(cuid())
+  matchId    String
+  fromUserId String
+  toUserId   String
+  status     String   // pending | approved | denied | revoked
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  match    Match @relation(fields: [matchId], references: [id])
+  fromUser User  @relation("WeChatFrom", fields: [fromUserId], references: [id])
+  toUser   User  @relation("WeChatTo", fields: [toUserId], references: [id])
+
+  @@unique([matchId, fromUserId, toUserId])
+  @@index([matchId])
+  @@index([toUserId, status])
 }

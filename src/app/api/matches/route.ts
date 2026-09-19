@@ -23,7 +23,6 @@ export async function GET() {
       threadId: m.thread?.id ?? null,
       createdAt: m.createdAt,
       other: publicUser(other),
-      wechatId: other.wechatId,
     };
   });
 
