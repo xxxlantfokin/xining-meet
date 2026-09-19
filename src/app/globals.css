@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+body {
+  background:
+    radial-gradient(ellipse at top, #fef3c7 0%, transparent 55%),
+    radial-gradient(ellipse at bottom right, #ffe4e6 0%, transparent 40%),
+    #fafaf9;
+}
+
+.safe-pb {
+  padding-bottom: calc(0.25rem + var(--safe-bottom));
+}
+
+.pb-nav {
+  padding-bottom: calc(5rem + var(--safe-bottom));
+}
