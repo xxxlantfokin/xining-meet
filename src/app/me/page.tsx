@@ -111,54 +111,52 @@ export default function MePage() {
   }
 
   const fieldClass =
-    "w-full rounded-2xl border border-cream-300 bg-cream-50/60 px-3.5 py-3 text-sm text-indigo-deep outline-none transition placeholder:text-indigo-soft/40 focus:border-turquoise/50 focus:bg-white focus:ring-2 focus:ring-turquoise/20";
+    "w-full rounded-2xl border-0 bg-cream-100 px-3.5 py-3 text-[15px] leading-[1.5] text-ink outline-none ring-1 ring-cream-300 transition placeholder:text-ink-mute focus:bg-cream-50 focus:ring-2 focus:ring-teal/30";
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-4 pt-safe pb-nav">
       <header className="mb-5 flex items-center justify-between animate-fade-up">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-turquoise">
-            {t("city")}
-          </p>
-          <h1 className="text-xl font-bold text-indigo-deep">{t("profileTitle")}</h1>
-          <p className="mt-0.5 text-xs text-indigo-soft/80">{t("profileSubtitle")}</p>
+          <p className="text-[12px] font-medium tracking-[0.16em] text-teal">{t("city")}</p>
+          <h1 className="text-[22px] font-semibold leading-[1.45] text-ink">{t("profileTitle")}</h1>
+          <p className="mt-0.5 text-[13px] leading-[1.45] text-ink-mute">{t("profileSubtitle")}</p>
         </div>
         <LanguageToggle />
       </header>
 
       {loading || !user ? (
         <div className="space-y-4 animate-fade-up">
-          <div className="skeleton h-28 rounded-3xl" />
-          <div className="skeleton h-64 rounded-3xl" />
+          <div className="skeleton h-28 rounded-[24px]" />
+          <div className="skeleton h-64 rounded-[24px]" />
         </div>
       ) : (
         <div className="space-y-4 animate-fade-up">
-          <section className="rounded-3xl border border-cream-300/80 bg-white p-5 shadow-soft">
+          <section className="rounded-[24px] bg-cream-50 p-5 shadow-soft">
             <div className="flex items-center gap-4">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={avatarUrl}
                   alt={user.name}
-                  className="h-16 w-16 rounded-2xl object-cover ring-2 ring-cream-200"
+                  className="h-16 w-16 rounded-2xl object-cover"
                 />
               ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-turquoise to-indigo-deep text-xl font-bold text-white ring-2 ring-cream-200">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal text-[22px] font-semibold text-cream-50">
                   {user.name.charAt(0)}
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <p className="text-lg font-bold text-indigo-deep">
+                <p className="text-[18px] font-semibold leading-[1.45] text-ink">
                   {user.name}
-                  <span className="ml-2 text-sm font-normal text-indigo-soft">
+                  <span className="ml-2 text-[13px] font-normal text-ink-soft">
                     {user.age}
                     {t("age")} ·{" "}
                     {user.gender === "male" ? t("genderMale") : t("genderFemale")}
                   </span>
                 </p>
-                <p className="mt-1 text-xs text-indigo-soft">
+                <p className="mt-1 text-[12px] leading-[1.45] text-ink-mute">
                   {t("accountLabel")}:{" "}
-                  <span className="font-mono text-turquoise">{user.id}</span>
+                  <span className="font-mono text-teal">{user.id}</span>
                 </p>
               </div>
             </div>
@@ -166,10 +164,10 @@ export default function MePage() {
 
           <form
             onSubmit={onSave}
-            className="space-y-4 rounded-3xl border border-cream-300/80 bg-white p-5 shadow-soft"
+            className="space-y-4 rounded-[24px] bg-cream-50 p-5 shadow-soft"
           >
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-indigo-soft">
+              <span className="mb-1.5 block text-[12px] font-medium tracking-wide text-ink-mute">
                 {t("avatarLabel")}
               </span>
               <input
@@ -182,7 +180,7 @@ export default function MePage() {
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-indigo-soft">
+              <span className="mb-1.5 block text-[12px] font-medium tracking-wide text-ink-mute">
                 {t("bioLabel")}
               </span>
               <textarea
@@ -193,13 +191,13 @@ export default function MePage() {
                 placeholder={t("bioPlaceholder")}
                 className={`${fieldClass} resize-none`}
               />
-              <span className="mt-1 block text-right text-[10px] text-indigo-soft/50">
+              <span className="mt-1 block text-right text-[12px] text-ink-mute">
                 {bio.length}/40
               </span>
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-indigo-soft">
+              <span className="mb-1.5 block text-[12px] font-medium tracking-wide text-ink-mute">
                 {t("cityLabel")}
               </span>
               <input
@@ -214,7 +212,7 @@ export default function MePage() {
 
             <div className="grid grid-cols-2 gap-3">
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-indigo-soft">
+                <span className="mb-1.5 block text-[12px] font-medium tracking-wide text-ink-mute">
                   {t("hometownLabel")}
                 </span>
                 <input
@@ -227,7 +225,7 @@ export default function MePage() {
                 />
               </label>
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-indigo-soft">
+                <span className="mb-1.5 block text-[12px] font-medium tracking-wide text-ink-mute">
                   {t("dialectLabel")}
                 </span>
                 <input
@@ -242,17 +240,15 @@ export default function MePage() {
             </div>
 
             <div>
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-indigo-soft">
+              <span className="mb-1.5 block text-[12px] font-medium tracking-wide text-ink-mute">
                 {t("languagePrefLabel")}
               </span>
-              <div className="inline-flex rounded-full border border-cream-300 bg-cream-50/60 p-0.5">
+              <div className="inline-flex rounded-full bg-cream-100 p-0.5 ring-1 ring-cream-300">
                 <button
                   type="button"
                   onClick={() => setLanguagePref("zh")}
-                  className={`pressable-sm rounded-full px-4 py-2 text-xs font-semibold transition ${
-                    languagePref === "zh"
-                      ? "bg-indigo-deep text-cream-50"
-                      : "text-indigo-soft"
+                  className={`pressable-sm rounded-full px-4 py-2 text-[13px] font-semibold transition ${
+                    languagePref === "zh" ? "bg-ink text-cream-50" : "text-ink-soft"
                   }`}
                 >
                   {t("langZh")}
@@ -260,10 +256,8 @@ export default function MePage() {
                 <button
                   type="button"
                   onClick={() => setLanguagePref("bo")}
-                  className={`pressable-sm rounded-full px-4 py-2 text-xs font-semibold transition ${
-                    languagePref === "bo"
-                      ? "bg-turquoise text-white"
-                      : "text-indigo-soft"
+                  className={`pressable-sm rounded-full px-4 py-2 text-[13px] font-semibold transition ${
+                    languagePref === "bo" ? "bg-teal text-cream-50" : "text-ink-soft"
                   }`}
                 >
                   {t("langBo")}
@@ -272,7 +266,7 @@ export default function MePage() {
             </div>
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-indigo-soft">
+              <span className="mb-1.5 block text-[12px] font-medium tracking-wide text-ink-mute">
                 {t("wechatLabel")}
               </span>
               <input
@@ -284,7 +278,7 @@ export default function MePage() {
                 placeholder={t("wechatPlaceholder")}
                 className={`${fieldClass} font-mono`}
               />
-              <span className="mt-1.5 block text-[11px] text-turquoise-deep">
+              <span className="mt-1.5 block text-[12px] leading-[1.45] text-teal-deep">
                 {t("wechatHint")}
               </span>
             </label>
@@ -292,46 +286,54 @@ export default function MePage() {
             <button
               type="submit"
               disabled={saving}
-              className="pressable w-full rounded-full bg-turquoise py-3.5 text-sm font-semibold text-white shadow-soft transition hover:bg-turquoise-deep disabled:opacity-50"
+              className="pressable w-full rounded-full bg-teal py-3.5 text-[15px] font-semibold text-cream-50 shadow-soft transition hover:bg-teal-deep disabled:opacity-50"
             >
               {saving ? t("saving") : t("saveProfile")}
             </button>
           </form>
 
-          <section className="rounded-3xl border border-dashed border-turquoise/25 bg-turquoise-mist/30 p-4">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-turquoise-deep">
+          <section className="rounded-[24px] bg-cream-50 p-4 shadow-soft">
+            <p className="mb-2.5 text-[12px] font-medium tracking-[0.12em] text-ink-mute">
               {t("profilePreview")}
             </p>
-            <div className="rounded-2xl bg-gradient-to-br from-indigo-deep to-indigo-soft p-4 text-cream-50 shadow-soft">
-              <p className="text-base font-bold">
-                {user.name}
-                <span className="ml-2 text-sm font-medium text-cream-200">
-                  {user.age}
-                  {t("age")}
-                </span>
-              </p>
-              <p className="mt-1 text-xs text-cream-200/90">
-                {city || "西宁"}
-                {hometown ? ` · ${hometown}` : ""}
-                {dialect ? ` · ${dialect}` : ""}
-              </p>
-              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-cream-100/95">
-                {bio || "…"}
-              </p>
+            <div className="overflow-hidden rounded-[20px]">
+              <div className="relative h-36 bg-ink-mist">
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarUrl} alt="" className="h-full w-full object-cover object-top" />
+                ) : null}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 to-transparent p-4 pt-10 text-cream-50">
+                  <p className="text-[16px] font-semibold leading-[1.45]">
+                    {user.name}
+                    <span className="ml-2 text-[13px] font-medium text-cream-200">
+                      {user.age}
+                      {t("age")}
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-[12px] leading-[1.45] text-cream-200/90">
+                    {city || "西宁"}
+                    {hometown ? ` · ${hometown}` : ""}
+                    {dialect ? ` · ${dialect}` : ""}
+                  </p>
+                  <p className="mt-1.5 line-clamp-2 text-[13px] leading-[1.45] text-cream-100/95">
+                    {bio || "…"}
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
 
-          <div className="flex gap-2 pt-1">
+          <div className="flex gap-2.5 pt-1">
             <Link
               href="/discover"
-              className="pressable flex-1 rounded-full border border-cream-300 bg-white py-3 text-center text-sm font-medium text-indigo-soft"
+              className="pressable flex-1 rounded-full bg-cream-50 py-3 text-center text-[15px] font-medium text-ink-soft shadow-soft"
             >
               {t("goDiscover")}
             </Link>
             <button
               type="button"
               onClick={logout}
-              className="pressable flex-1 rounded-full border border-rose-200/80 bg-white py-3 text-sm font-medium text-rose-500"
+              className="pressable flex-1 rounded-full bg-cream-50 py-3 text-[15px] font-medium text-ink-mute shadow-soft"
             >
               {t("logout")}
             </button>

@@ -58,10 +58,8 @@ export default function MatchesPage() {
     <main className="mx-auto min-h-dvh max-w-lg px-4 pt-safe pb-nav">
       <header className="mb-5 flex items-center justify-between animate-fade-up">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-turquoise">
-            {t("city")}
-          </p>
-          <h1 className="text-xl font-bold text-indigo-deep">{t("matches")}</h1>
+          <p className="text-[12px] font-medium tracking-[0.16em] text-teal">{t("city")}</p>
+          <h1 className="text-[22px] font-semibold leading-[1.45] text-ink">{t("matches")}</h1>
         </div>
         <LanguageToggle />
       </header>
@@ -69,19 +67,21 @@ export default function MatchesPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="skeleton h-28 rounded-3xl" />
+            <div key={i} className="skeleton h-28 rounded-[24px]" />
           ))}
         </div>
       ) : matches.length === 0 ? (
-        <div className="mt-10 flex flex-col items-center rounded-4xl border border-dashed border-turquoise/30 bg-white/80 px-6 py-14 text-center shadow-soft animate-fade-up">
-          <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gold-mist text-2xl text-gold-deep">
+        <div className="mt-8 flex flex-col items-center rounded-[28px] bg-cream-50 px-6 py-14 text-center shadow-soft animate-fade-up">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gold-mist text-[20px] text-gold-deep">
             ♥
           </div>
-          <p className="text-lg font-bold text-indigo-deep">{t("emptyMatches")}</p>
-          <p className="mt-2 max-w-xs text-sm text-indigo-soft">{t("emptyMatchesHint")}</p>
+          <p className="text-[22px] font-semibold leading-[1.45] text-ink">{t("emptyMatches")}</p>
+          <p className="mt-2 max-w-xs text-[15px] leading-[1.5] text-ink-soft">
+            {t("emptyMatchesHint")}
+          </p>
           <Link
             href="/discover"
-            className="pressable mt-5 inline-block rounded-full bg-turquoise px-5 py-2.5 text-sm font-semibold text-white shadow-soft"
+            className="pressable mt-6 inline-block rounded-full bg-teal px-5 py-2.5 text-[15px] font-semibold text-cream-50 shadow-soft"
           >
             {t("goDiscover")}
           </Link>
@@ -91,31 +91,33 @@ export default function MatchesPage() {
           {matches.map((m) => (
             <li
               key={m.matchId}
-              className="rounded-3xl border border-cream-300/80 bg-white p-4 shadow-soft transition hover:shadow-card"
+              className="rounded-[24px] bg-cream-50 p-4 shadow-soft transition hover:shadow-card"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3.5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={m.other.avatarUrl}
                   alt={m.other.name}
-                  className="h-14 w-14 rounded-2xl object-cover ring-2 ring-cream-200"
+                  className="h-14 w-14 rounded-2xl object-cover"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-indigo-deep">
+                  <p className="text-[16px] font-semibold leading-[1.45] text-ink">
                     {m.other.name}
-                    <span className="ml-1.5 text-sm font-normal text-indigo-soft">
+                    <span className="ml-1.5 text-[13px] font-normal text-ink-soft">
                       {m.other.age}
                       {t("age")}
                     </span>
                   </p>
-                  <p className="mt-0.5 truncate text-xs text-indigo-soft/80">{m.other.bio}</p>
+                  <p className="mt-0.5 truncate text-[13px] leading-[1.45] text-ink-mute">
+                    {m.other.bio}
+                  </p>
                 </div>
               </div>
               <div className="mt-3.5 flex gap-2">
                 {m.threadId && (
                   <Link
                     href={`/chat/${m.threadId}`}
-                    className="pressable flex-1 rounded-full bg-indigo-deep py-2.5 text-center text-sm font-semibold text-cream-50"
+                    className="pressable flex-1 rounded-full bg-ink py-2.5 text-center text-[15px] font-semibold text-cream-50"
                   >
                     {t("chat")}
                   </Link>
@@ -123,7 +125,7 @@ export default function MatchesPage() {
                 <button
                   type="button"
                   onClick={() => copyWechat(m.wechatId)}
-                  className="pressable flex-1 rounded-full border border-turquoise/25 bg-turquoise-mist py-2.5 text-sm font-semibold text-turquoise-deep"
+                  className="pressable flex-1 rounded-full bg-teal-mist py-2.5 text-[15px] font-semibold text-teal-deep"
                 >
                   {t("copyWechat")}
                 </button>

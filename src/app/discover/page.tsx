@@ -24,6 +24,8 @@ type UserCard = {
 
 type Dir = "like" | "pass";
 
+const EXIT_WAIT = 280;
+
 export default function DiscoverPage() {
   const { t } = useLang();
   const router = useRouter();
@@ -90,7 +92,7 @@ export default function DiscoverPage() {
       setBusy(true);
       setExitDir(direction);
       setPulse(direction);
-      setTimeout(() => setPulse(null), 280);
+      setTimeout(() => setPulse(null), 240);
       showToast(direction === "like" ? t("likedToast") : t("passedToast"));
 
       const apiPromise = fetch("/api/swipe", {
@@ -104,7 +106,7 @@ export default function DiscoverPage() {
         })
         .catch(() => ({ ok: false, data: {} as Record<string, unknown> }));
 
-      await new Promise((r) => setTimeout(r, 420));
+      await new Promise((r) => setTimeout(r, EXIT_WAIT));
 
       const { ok, data } = await apiPromise;
 
@@ -135,23 +137,24 @@ export default function DiscoverPage() {
 
   const current = candidates[0];
   const next = candidates[1];
+  const third = candidates[2];
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col px-4 pt-safe pb-nav">
       <header className="mb-4 flex items-center justify-between animate-fade-up">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-turquoise">
+          <p className="text-[12px] font-medium tracking-[0.16em] text-teal">
             {t("city")} · {t("discover")}
           </p>
-          <h1 className="mt-0.5 text-xl font-bold tracking-tight text-indigo-deep">
+          <h1 className="mt-0.5 text-[22px] font-semibold leading-[1.45] tracking-tight text-ink">
             {t("appName")}
           </h1>
           {me && (
-            <p className="mt-0.5 text-xs text-indigo-soft/80">
+            <p className="mt-0.5 text-[12px] leading-[1.45] text-ink-mute">
               {me.name}
               <Link
                 href="/login"
-                className="ml-2 text-turquoise underline-offset-2 hover:underline"
+                className="ml-2 text-teal underline-offset-2 hover:underline"
               >
                 {t("switchAccount")}
               </Link>
@@ -163,31 +166,31 @@ export default function DiscoverPage() {
 
       <div
         className="relative mx-auto w-full flex-1"
-        style={{ minHeight: "28rem", maxHeight: "34rem" }}
+        style={{ minHeight: "min(62dvh, 34rem)", maxHeight: "36rem" }}
       >
         {loading ? (
-          <div className="flex h-full flex-col overflow-hidden rounded-4xl bg-white shadow-card ring-1 ring-cream-300/80">
+          <div className="flex h-full flex-col overflow-hidden rounded-[28px] bg-cream-50 shadow-card">
             <div className="skeleton flex-1" />
-            <div className="space-y-2 p-5">
-              <div className="skeleton h-6 w-40 rounded-lg" />
+            <div className="space-y-2.5 p-5">
+              <div className="skeleton h-6 w-36 rounded-lg" />
               <div className="skeleton h-4 w-full rounded-lg" />
               <div className="skeleton h-4 w-3/4 rounded-lg" />
             </div>
           </div>
         ) : !current ? (
-          <div className="flex h-full flex-col items-center justify-center rounded-4xl border border-dashed border-turquoise/30 bg-white/80 px-6 text-center shadow-soft animate-fade-up">
-            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-turquoise-mist text-2xl text-turquoise">
+          <div className="flex h-full flex-col items-center justify-center rounded-[28px] bg-cream-50 px-6 text-center shadow-soft animate-fade-up">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-teal-mist text-[20px] text-teal">
               ✧
             </div>
-            <p className="text-lg font-bold text-indigo-deep">
+            <p className="text-[22px] font-semibold leading-[1.45] text-ink">
               {nearbyHint ? t("emptyNearby") : t("emptyDiscover")}
             </p>
             {!nearbyHint && (
-              <p className="mt-2 max-w-xs text-sm text-indigo-soft">
+              <p className="mt-2 max-w-xs text-[15px] leading-[1.5] text-ink-soft">
                 {t("emptyDiscoverHint")}
               </p>
             )}
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
               {!nearbyHint ? (
                 <button
                   type="button"
@@ -195,7 +198,7 @@ export default function DiscoverPage() {
                     setNearbyHint(true);
                     load();
                   }}
-                  className="pressable rounded-full bg-indigo-deep px-5 py-2.5 text-sm font-semibold text-cream-50 shadow-soft"
+                  className="pressable rounded-full bg-teal px-5 py-2.5 text-[15px] font-semibold text-cream-50 shadow-soft"
                 >
                   {t("refresh")}
                 </button>
@@ -203,14 +206,14 @@ export default function DiscoverPage() {
                 <button
                   type="button"
                   onClick={load}
-                  className="pressable rounded-full bg-indigo-deep px-5 py-2.5 text-sm font-semibold text-cream-50 shadow-soft"
+                  className="pressable rounded-full bg-teal px-5 py-2.5 text-[15px] font-semibold text-cream-50 shadow-soft"
                 >
                   {t("seeNearby")}
                 </button>
               )}
               <Link
                 href="/me"
-                className="pressable rounded-full border border-cream-300 bg-white px-5 py-2.5 text-sm font-medium text-indigo-soft"
+                className="pressable rounded-full bg-cream-200/80 px-5 py-2.5 text-[15px] font-medium text-ink-soft"
               >
                 {t("editProfile")}
               </Link>
@@ -218,9 +221,14 @@ export default function DiscoverPage() {
           </div>
         ) : (
           <>
-            {next && (
+            {third && (
               <div className="pointer-events-none absolute inset-0 card-stack-behind">
-                <div className="h-full w-full overflow-hidden rounded-4xl bg-cream-200 shadow-soft" />
+                <div className="h-full w-full overflow-hidden rounded-[28px] bg-cream-300/80 shadow-soft" />
+              </div>
+            )}
+            {next && (
+              <div className="pointer-events-none absolute inset-0 card-stack-mid">
+                <div className="h-full w-full overflow-hidden rounded-[28px] bg-cream-200 shadow-soft" />
               </div>
             )}
             <div className="absolute inset-0 z-10">
@@ -240,13 +248,13 @@ export default function DiscoverPage() {
       </div>
 
       {current && (
-        <div className="relative z-20 mt-6 flex items-center justify-center gap-10 animate-fade-up">
+        <div className="relative z-20 mt-5 flex items-center justify-center gap-9 animate-fade-up">
           <button
             type="button"
             disabled={busy}
             onClick={() => swipe("pass")}
-            className={`pressable flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full border-2 border-cream-300 bg-white text-3xl text-indigo-soft shadow-soft transition hover:border-rose-300 hover:text-rose-500 disabled:opacity-50 ${
-              pulse === "pass" ? "action-pop border-rose-400 text-rose-500" : ""
+            className={`pressable flex h-[4rem] w-[4rem] items-center justify-center rounded-full bg-cream-50 text-[26px] text-ink-soft shadow-soft ring-1 ring-cream-300 transition hover:text-ink disabled:opacity-50 ${
+              pulse === "pass" ? "action-pop" : ""
             }`}
             aria-label={t("pass")}
           >
@@ -256,8 +264,8 @@ export default function DiscoverPage() {
             type="button"
             disabled={busy}
             onClick={() => swipe("like")}
-            className={`pressable flex h-[5rem] w-[5rem] items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-rose-600 text-3xl text-white shadow-float transition hover:brightness-110 disabled:opacity-50 ${
-              pulse === "like" ? "action-pop ring-4 ring-rose-300/60" : ""
+            className={`pressable flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-full bg-teal text-[28px] text-cream-50 shadow-float transition hover:bg-teal-deep disabled:opacity-50 ${
+              pulse === "like" ? "action-pop" : ""
             }`}
             aria-label={t("like")}
           >
@@ -267,7 +275,7 @@ export default function DiscoverPage() {
       )}
 
       {current && (
-        <p className="mt-3 text-center text-[11px] text-indigo-soft/60">
+        <p className="mt-3 text-center text-[12px] leading-[1.45] text-ink-mute">
           {t("swipeHint")}
         </p>
       )}

@@ -94,10 +94,10 @@ export default function ChatPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col">
-      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-cream-300/80 bg-cream-50/95 px-3 py-3 backdrop-blur-md pt-safe">
+      <header className="glass-panel sticky top-0 z-10 flex items-center gap-3 border-b border-cream-300/60 px-3 py-3 pt-safe">
         <Link
           href="/messages"
-          className="pressable-sm flex h-9 w-9 items-center justify-center rounded-full bg-white text-indigo-deep shadow-soft ring-1 ring-cream-300"
+          className="pressable-sm flex h-10 w-10 items-center justify-center rounded-full bg-cream-50 text-ink shadow-soft"
           aria-label="Back"
         >
           ←
@@ -108,11 +108,13 @@ export default function ChatPage() {
             <img
               src={other.avatarUrl}
               alt={other.name}
-              className="h-9 w-9 rounded-full object-cover ring-2 ring-cream-200"
+              className="h-10 w-10 rounded-full object-cover"
             />
             <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold text-indigo-deep">{other.name}</p>
-              <p className="text-[10px] text-indigo-soft/70">{t("wechatChatHint")}</p>
+              <p className="truncate text-[16px] font-semibold leading-[1.45] text-ink">
+                {other.name}
+              </p>
+              <p className="text-[12px] leading-[1.45] text-ink-mute">{t("wechatChatHint")}</p>
             </div>
           </>
         )}
@@ -120,17 +122,17 @@ export default function ChatPage() {
       </header>
 
       {wechatId && (
-        <div className="border-b border-turquoise/15 bg-turquoise-mist/50 px-4 py-2.5">
+        <div className="border-b border-teal/10 bg-teal-mist/40 px-4 py-2.5">
           <button
             type="button"
             onClick={copyWechat}
-            className="pressable flex w-full items-center justify-between gap-2 rounded-2xl bg-white px-3.5 py-2.5 text-sm shadow-soft ring-1 ring-turquoise/20"
+            className="pressable flex w-full items-center justify-between gap-2 rounded-2xl bg-cream-50 px-3.5 py-2.5 text-[15px] shadow-soft"
           >
-            <span className="min-w-0 truncate text-turquoise-deep">
+            <span className="min-w-0 truncate text-teal-deep">
               {t("wechat")}:{" "}
               <span className="font-mono font-semibold">{wechatId}</span>
             </span>
-            <span className="shrink-0 rounded-full bg-turquoise px-3 py-1 text-xs font-semibold text-white">
+            <span className="shrink-0 rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-cream-50">
               {t("copyWechat")}
             </span>
           </button>
@@ -146,26 +148,25 @@ export default function ChatPage() {
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-up">
-            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-mist text-xl text-indigo-soft">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-ink-mist text-[18px] text-ink-soft">
               ✦
             </div>
-            <p className="text-sm font-medium text-indigo-deep">{t("chatEmpty")}</p>
-            <p className="mt-1 text-xs text-indigo-soft">{t("chatEmptyHint")}</p>
+            <p className="text-[16px] font-semibold text-ink">{t("chatEmpty")}</p>
+            <p className="mt-1 text-[13px] leading-[1.45] text-ink-soft">{t("chatEmptyHint")}</p>
           </div>
         ) : (
-          messages.map((m, i) => {
+          messages.map((m) => {
             const mine = m.senderId === meId;
             return (
               <div
                 key={m.id}
                 className={`flex animate-fade-up ${mine ? "justify-end" : "justify-start"}`}
-                style={{ animationDelay: `${Math.min(i, 8) * 30}ms` }}
               >
                 <div
-                  className={`max-w-[78%] px-3.5 py-2.5 text-sm leading-relaxed shadow-soft ${
+                  className={`max-w-[78%] px-3.5 py-2.5 text-[15px] leading-[1.5] shadow-soft ${
                     mine
-                      ? "rounded-2xl rounded-br-md bg-indigo-deep text-cream-50"
-                      : "rounded-2xl rounded-bl-md bg-white text-indigo-deep ring-1 ring-cream-300/80"
+                      ? "rounded-2xl rounded-br-md bg-ink text-cream-50"
+                      : "rounded-2xl rounded-bl-md bg-cream-50 text-ink ring-1 ring-cream-300/70"
                   }`}
                 >
                   {m.body}
@@ -178,7 +179,7 @@ export default function ChatPage() {
       </div>
 
       <form
-        className="sticky bottom-0 flex gap-2 border-t border-cream-300/80 bg-cream-50/95 p-3 backdrop-blur-md safe-pb"
+        className="glass-panel sticky bottom-0 flex gap-2 border-t border-cream-300/60 p-3 safe-pb"
         onSubmit={(e) => {
           e.preventDefault();
           send();
@@ -189,12 +190,12 @@ export default function ChatPage() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={t("placeholder")}
-          className="flex-1 rounded-full border border-cream-300 bg-white px-4 py-2.5 text-sm text-indigo-deep outline-none transition placeholder:text-indigo-soft/50 focus:border-turquoise/50 focus:ring-2 focus:ring-turquoise/20"
+          className="flex-1 rounded-full border-0 bg-cream-50 px-4 py-3 text-[15px] text-ink outline-none ring-1 ring-cream-300 placeholder:text-ink-mute focus:ring-2 focus:ring-teal/30"
         />
         <button
           type="submit"
           disabled={sending || !text.trim()}
-          className="pressable rounded-full bg-turquoise px-5 py-2.5 text-sm font-semibold text-white shadow-soft disabled:opacity-40"
+          className="pressable rounded-full bg-teal px-5 py-3 text-[15px] font-semibold text-cream-50 shadow-soft disabled:opacity-40"
         >
           {t("send")}
         </button>

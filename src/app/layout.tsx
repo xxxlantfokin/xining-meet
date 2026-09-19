@@ -19,7 +19,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#1A1744",
+  themeColor: "#F7F2EA",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -30,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body
-        className={`${notoSans.variable} font-sans min-h-dvh text-indigo-deep antialiased`}
+        className={`${notoSans.variable} font-sans min-h-dvh bg-cream-100 text-ink antialiased`}
       >
         <LangProvider>{children}</LangProvider>
       </body>

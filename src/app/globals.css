@@ -5,75 +5,85 @@
 :root {
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
-  --ink: #1a1744;
-  --cream: #f8f4ee;
-  --turquoise: #0d9488;
-  --gold: #c9a24a;
+  --ink: #1f2a44;
+  --cream: #f7f2ea;
+  --teal: #2a9d8f;
+  --gold: #c4a574;
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   color: var(--ink);
-  background:
-    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(13, 148, 136, 0.12), transparent 50%),
-    radial-gradient(ellipse 70% 40% at 100% 0%, rgba(201, 162, 74, 0.14), transparent 45%),
-    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(45, 42, 107, 0.06), transparent 50%),
-    #f8f4ee;
+  background: var(--cream);
   min-height: 100dvh;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
 ::selection {
-  background: rgba(13, 148, 136, 0.2);
+  background: rgba(42, 157, 143, 0.18);
   color: var(--ink);
 }
 
 @layer utilities {
   .pressable {
-    @apply transition-all duration-150 ease-out;
+    @apply transition-transform duration-150 ease-out;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   .pressable:active {
-    transform: scale(0.92);
-    filter: brightness(0.95);
+    transform: scale(0.94);
   }
   .pressable-sm {
-    @apply transition-all duration-100 ease-out;
+    @apply transition-transform duration-100 ease-out;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   .pressable-sm:active {
-    transform: scale(0.88);
+    transform: scale(0.9);
   }
   .safe-pb {
-    padding-bottom: calc(0.25rem + var(--safe-bottom));
+    padding-bottom: calc(0.5rem + var(--safe-bottom));
   }
   .pb-nav {
-    padding-bottom: calc(5.5rem + var(--safe-bottom));
+    padding-bottom: calc(5.75rem + var(--safe-bottom));
   }
   .pt-safe {
     padding-top: calc(0.75rem + var(--safe-top));
   }
+  .glass-panel {
+    background: rgba(251, 248, 243, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
 }
 
 .card-stack-behind {
-  transform: scale(0.96) translateY(10px);
-  opacity: 0.55;
+  transform: scale(0.965) translateY(12px);
+  opacity: 0.5;
+}
+
+.card-stack-mid {
+  transform: scale(0.985) translateY(6px);
+  opacity: 0.72;
 }
 
 .chat-scroll::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 .chat-scroll::-webkit-scrollbar-thumb {
-  background: rgba(45, 42, 107, 0.15);
+  background: rgba(31, 42, 68, 0.12);
   border-radius: 4px;
 }
 
 .skeleton {
   background: linear-gradient(90deg, #ebe4d8 0%, #f5efe6 40%, #ebe4d8 80%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s linear infinite;
+  animation: shimmer 1.6s linear infinite;
 }
 
 @keyframes shimmer {
@@ -81,46 +91,23 @@ body {
   100% { background-position: 200% 0; }
 }
 
-.match-sparkle::before,
-.match-sparkle::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  animation: sparkle-float 1.2s ease-out infinite;
-}
-.match-sparkle::before {
-  top: 12%;
-  left: 18%;
-  animation-delay: 0.1s;
-}
-.match-sparkle::after {
-  top: 20%;
-  right: 16%;
-  background: var(--turquoise);
-  animation-delay: 0.35s;
-}
-
-@keyframes sparkle-float {
-  0% { opacity: 0; transform: translateY(8px) scale(0.5); }
-  40% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-20px) scale(1); }
-}
-
 @keyframes action-pop {
   0% { transform: scale(1); }
-  40% { transform: scale(0.86); }
+  40% { transform: scale(0.9); }
   100% { transform: scale(1); }
 }
 .action-pop {
-  animation: action-pop 0.28s ease-out;
+  animation: action-pop 0.24s ease-out;
 }
 
-/* Subtle haptic-like feedback for primary actions */
-@media (hover: none) {
-  .pressable:active {
-    transform: scale(0.9);
-  }
+/* Quiet editorial divider accent — teal hairline, not ornament */
+.accent-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(42, 157, 143, 0.35), transparent);
+}
+
+@keyframes avatar-bounce {
+  0% { transform: scale(0.88) translateY(6px); }
+  55% { transform: scale(1.04) translateY(-2px); }
+  100% { transform: scale(1) translateY(0); }
 }

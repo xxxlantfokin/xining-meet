@@ -12,23 +12,23 @@ function AvatarBlock({
   side: "left" | "right";
 }) {
   const initial = (name || "?").trim().charAt(0) || "?";
-  const colors =
-    side === "left"
-      ? "from-turquoise to-turquoise-deep"
-      : "from-indigo-soft to-indigo-deep";
+  const delay = side === "left" ? "0ms" : "60ms";
 
   return (
     <div
-      className={`relative h-20 w-20 overflow-hidden rounded-full ring-4 ring-white shadow-card ${
-        side === "left" ? "z-10" : "z-20 -ml-5"
+      className={`relative h-[4.5rem] w-[4.5rem] overflow-hidden rounded-full shadow-card ring-[3px] ring-cream-50 ${
+        side === "left" ? "z-10" : "z-20 -ml-4"
       }`}
+      style={{ animation: `avatar-bounce 0.45s ease-out ${delay} both` }}
     >
       {avatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />
       ) : (
         <div
-          className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${colors} text-2xl font-bold text-white`}
+          className={`flex h-full w-full items-center justify-center text-[22px] font-semibold text-cream-50 ${
+            side === "left" ? "bg-teal" : "bg-ink"
+          }`}
         >
           {initial}
         </div>
@@ -59,37 +59,35 @@ export default function MatchModal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-indigo-deep/50 p-5 backdrop-blur-sm animate-fade-in">
-      <div className="match-sparkle relative w-full max-w-sm overflow-hidden rounded-4xl bg-cream-50 p-7 text-center shadow-float animate-match-burst">
-        <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-turquoise/10" />
-        <div className="pointer-events-none absolute -bottom-10 -left-6 h-28 w-28 rounded-full bg-gold/15" />
-
-        <p className="relative text-xs font-semibold uppercase tracking-[0.2em] text-gold-deep">
-          ✦ Match ✦
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/45 p-5 backdrop-blur-[6px] animate-fade-in">
+      <div className="relative w-full max-w-sm overflow-hidden rounded-[28px] bg-cream-50 p-7 text-center shadow-float animate-match-in">
+        {/* Gold reserved for match moment only */}
+        <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-gold-deep">
+          Match
         </p>
+        <div className="mx-auto mt-1 h-px w-10 bg-gold/50" />
 
-        <div className="relative mx-auto mt-5 flex items-center justify-center">
-          <div className="absolute inset-0 m-auto h-24 w-40 rounded-full bg-gradient-to-br from-turquoise/20 to-gold/30 animate-pulse-soft" />
+        <div className="relative mx-auto mt-6 flex items-center justify-center">
           <AvatarBlock name={myName} avatarUrl={myAvatarUrl} side="left" />
           <AvatarBlock name={name} avatarUrl={avatarUrl} side="right" />
         </div>
 
-        <p className="relative mt-6 text-lg font-bold text-indigo-deep">{matchedLabel}</p>
-        <p className="relative mt-1 text-sm text-indigo-soft">
+        <p className="mt-6 text-[22px] font-semibold leading-[1.45] text-ink">{matchedLabel}</p>
+        <p className="mt-1.5 text-[13px] leading-[1.45] text-ink-soft">
           {myName} · {name}
         </p>
 
-        <div className="relative mt-7 flex flex-col gap-2.5">
+        <div className="mt-7 flex flex-col gap-2.5">
           <Link
             href={`/chat/${threadId}`}
-            className="pressable rounded-full bg-turquoise px-4 py-3.5 text-sm font-semibold text-white shadow-soft transition hover:bg-turquoise-deep"
+            className="pressable rounded-full bg-teal px-4 py-3.5 text-[15px] font-semibold text-cream-50 shadow-soft transition hover:bg-teal-deep"
           >
             {openChatLabel}
           </Link>
           <button
             type="button"
             onClick={onClose}
-            className="pressable rounded-full border border-cream-300 bg-white px-4 py-3 text-sm font-medium text-indigo-soft transition hover:border-indigo-mist hover:text-indigo-deep"
+            className="pressable rounded-full px-4 py-3 text-[15px] font-medium text-ink-soft transition hover:bg-cream-200/60 hover:text-ink"
           >
             {keepLabel}
           </button>

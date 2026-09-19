@@ -16,8 +16,9 @@ type UserCard = {
 
 type Dir = "like" | "pass";
 
-const THRESHOLD = 110;
-const VELOCITY = 0.55; // px/ms
+const THRESHOLD = 100;
+const VELOCITY = 0.5; // px/ms
+const EXIT_MS = 260;
 
 export default function SwipeCard({
   user,
@@ -50,16 +51,16 @@ export default function SwipeCard({
   const paint = useCallback((x: number, y: number, dragging: boolean, leaving: boolean) => {
     const el = cardRef.current;
     if (!el) return;
-    const rot = x / 22;
+    const rot = x / 28;
     el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rot}deg)`;
     el.style.transition = dragging
       ? "none"
       : leaving
-        ? "transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1)"
-        : "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
+        ? `transform ${EXIT_MS}ms ease-out`
+        : "transform 0.42s cubic-bezier(0.22, 1, 0.36, 1)";
     el.style.opacity = "1";
-    const likeO = Math.min(1, Math.max(0, x / 80));
-    const passO = Math.min(1, Math.max(0, -x / 80));
+    const likeO = Math.min(1, Math.max(0, x / 90));
+    const passO = Math.min(1, Math.max(0, -x / 90));
     if (likeStampRef.current) likeStampRef.current.style.opacity = String(likeO);
     if (passStampRef.current) passStampRef.current.style.opacity = String(passO);
   }, []);
@@ -78,10 +79,9 @@ export default function SwipeCard({
       if (firedRef.current || disabled) return;
       firedRef.current = true;
       draggingRef.current = false;
-      const flyX = dir === "like" ? window.innerWidth * 1.15 : -window.innerWidth * 1.15;
-      const flyY = fromY + (dir === "like" ? 40 : 60);
+      const flyX = dir === "like" ? window.innerWidth * 1.2 : -window.innerWidth * 1.2;
+      const flyY = fromY + (dir === "like" ? 28 : 40);
       paint(fromX, fromY, true, false);
-      // next frame start fling transition
       requestAnimationFrame(() => {
         paint(flyX, flyY, false, true);
         if (likeStampRef.current) likeStampRef.current.style.opacity = dir === "like" ? "1" : "0";
@@ -92,11 +92,10 @@ export default function SwipeCard({
     [disabled, onSwipe, paint]
   );
 
-  // Button-driven exit from parent
   useEffect(() => {
     if (!exitDir || firedRef.current) return;
     const { x, y } = posRef.current;
-    commit(exitDir, x || (exitDir === "like" ? 40 : -40), y || 20);
+    commit(exitDir, x || (exitDir === "like" ? 36 : -36), y || 16);
   }, [exitDir, commit]);
 
   const onPointerDown = useCallback(
@@ -117,10 +116,9 @@ export default function SwipeCard({
       if (!startRef.current || !draggingRef.current || firedRef.current) return;
       const rawX = e.clientX - startRef.current.x;
       const rawY = e.clientY - startRef.current.y;
-      // rubber-band: ease beyond threshold
       const abs = Math.abs(rawX);
-      const rubber = abs <= THRESHOLD ? rawX : Math.sign(rawX) * (THRESHOLD + (abs - THRESHOLD) * 0.35);
-      const y = rawY * 0.22;
+      const rubber = abs <= THRESHOLD ? rawX : Math.sign(rawX) * (THRESHOLD + (abs - THRESHOLD) * 0.32);
+      const y = rawY * 0.18;
       const now = performance.now();
       posRef.current = { x: rubber, y };
       lastMoveRef.current = { x: e.clientX, t: now };
@@ -142,7 +140,6 @@ export default function SwipeCard({
       const { x, y } = posRef.current;
       const last = lastMoveRef.current;
       const now = performance.now();
-      // Prefer recent motion; fall back to whole gesture if sample is stale
       let vx = 0;
       if (last && startRef.current) {
         const sampleAge = now - last.t;
@@ -154,29 +151,37 @@ export default function SwipeCard({
 
       const fast = Math.abs(vx) >= VELOCITY;
       const far = Math.abs(x) >= THRESHOLD;
-      if ((far || fast) && (Math.abs(x) > 24 || Math.abs(vx) >= VELOCITY * 0.85)) {
+      if ((far || fast) && (Math.abs(x) > 20 || Math.abs(vx) >= VELOCITY * 0.85)) {
         const dir: Dir = fast ? (vx > 0 ? "like" : "pass") : x > 0 ? "like" : "pass";
         commit(dir, x, y);
         return;
       }
-      // spring back
       posRef.current = { x: 0, y: 0 };
       paint(0, 0, false, false);
     },
     [commit, paint]
   );
 
+  const meta = [
+    user.city,
+    user.hometown,
+    user.dialect,
+    genderLabel,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <div
       ref={cardRef}
-      className="relative flex h-full w-full touch-none select-none flex-col overflow-hidden rounded-4xl bg-white shadow-card ring-1 ring-cream-300/80 will-change-transform"
+      className="relative flex h-full w-full touch-none select-none flex-col overflow-hidden rounded-[28px] bg-cream-50 shadow-card will-change-transform"
       style={{ transform: "translate3d(0,0,0)", touchAction: "none" }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
     >
-      <div className="relative min-h-0 flex-1 bg-gradient-to-br from-indigo-mist via-cream-100 to-turquoise-mist">
+      <div className="relative min-h-0 flex-1 bg-ink-mist">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={user.avatarUrl}
@@ -184,35 +189,28 @@ export default function SwipeCard({
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top"
           draggable={false}
         />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-indigo-deep/90 via-indigo-deep/45 to-transparent p-5 pt-20 text-white">
-          <h2 className="text-2xl font-bold tracking-tight">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 via-ink/40 to-transparent px-5 pb-6 pt-24 text-cream-50">
+          <h2 className="text-[22px] font-semibold leading-[1.45] tracking-tight">
             {user.name}
-            <span className="ml-2 text-lg font-medium text-cream-200">
+            <span className="ml-2 text-[16px] font-medium text-cream-200">
               {user.age}
               {ageLabel}
             </span>
           </h2>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-cream-200/90">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-turquoise-soft" />
-            {user.city}
-            {user.hometown ? ` · ${user.hometown}` : ""}
-            {user.dialect ? ` · ${user.dialect}` : ""}
-            {" · "}
-            {genderLabel}
-          </p>
-          <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-cream-100/95">{user.bio}</p>
+          <p className="mt-1.5 text-[13px] leading-[1.45] text-cream-200/90">{meta}</p>
+          <p className="mt-3 line-clamp-3 text-[15px] leading-[1.5] text-cream-100/95">{user.bio}</p>
         </div>
 
         <div
           ref={likeStampRef}
-          className="pointer-events-none absolute left-5 top-8 rotate-[-18deg] rounded-xl border-4 border-turquoise px-3 py-1 text-xl font-black uppercase tracking-widest text-turquoise"
+          className="pointer-events-none absolute left-5 top-7 rotate-[-14deg] rounded-xl border-[3px] border-teal px-3 py-1 text-[15px] font-semibold tracking-[0.14em] text-teal"
           style={{ opacity: 0 }}
         >
           LIKE
         </div>
         <div
           ref={passStampRef}
-          className="pointer-events-none absolute right-5 top-8 rotate-[18deg] rounded-xl border-4 border-rose-400 px-3 py-1 text-xl font-black uppercase tracking-widest text-rose-400"
+          className="pointer-events-none absolute right-5 top-7 rotate-[14deg] rounded-xl border-[3px] border-ink-mute px-3 py-1 text-[15px] font-semibold tracking-[0.14em] text-ink-mute"
           style={{ opacity: 0 }}
         >
           PASS
